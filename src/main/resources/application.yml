@@ -12,6 +12,12 @@ spring:
       name: java
       password: 1234
 
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: false
+      path: /h2-console
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver

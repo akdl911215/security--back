@@ -1,5 +1,6 @@
 package com.example.security.config;
 
+import com.example.security.config.jwt.JwtLoginFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -17,10 +19,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration // ioc 등록
 public class SercurityConfig extends WebSecurityConfigurerAdapter {
 
+
+    @Bean//시큐리티가 비밀번호 검증할 때, 무조건 암호화해서 회원가입을 시켜줘야됨.
+    public BCryptPasswordEncoder encoder(){
+        return new BCryptPasswordEncoder();
+    }
+
 //    @Override
 //    public void configure(WebSecurity web) throws Exception {
 //        super.configure(web);
-//        web.ignoring().mvcMatchers("/**");
+//        web.ignoring().mvcMatchers("/**"); //문지기가 사람들을 다 통과시켜줌
 //    }
 
 
@@ -45,36 +53,75 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-//        http.
-//                cors().configurationSource(corsConfigurationSource())
-//                .and()
-//                .csrf().disable()
-//                .formLogin().disable()
-//                .httpBasic().disable()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                //statefull stateless 방식의 차이.. 저희가 자바스크립트 사이드,
-//        //jsp 로 시큐리티를 jsession을 자바스크립트,
-//                .and()
-//                .logout();
-//jWT를 사용하기 전에 기본적으로 from-login 방식을 먼저 테스트해볼게요.
-
-
-        http.csrf().disable(); //csrf는 form 태그를 통한 공격인데 시큐리티가 이걸 방지하기 위해
-        //form 태그로 값을 전송할 떼, 어떤 value 같이 전송하도록 설정함. 자세한 내용은
-
-        //네거티브 방식 = 성문을 다 닫는거에요.  성문을 기본적으로 어떤 요청만 성문을 막아놓을거에요.
-
-        http.authorizeRequests()
-                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
-                .anyRequest().permitAll() //그 외의 모든 요청은 성문을 열어놓겠다.
+        http.
+                cors().configurationSource(corsConfigurationSource())
                 .and()
-                .formLogin(); //시큐리티 기본전략이 form..
+                .csrf().disable()
+                .formLogin().disable()
+                .httpBasic().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                //statefull stateless 방식의 차이.. 저희가 자바스크립트 사이드,
+        //jsp 로 시큐리티를 jsession을 자바스크립트,
+                .and()
+
+                .addFilter(jwtLoginFilter())
+
+                .authorizeRequests()
+                .anyRequest().permitAll()
+                ;
+                //.antMatchers("/user").access("hasRole("ROLE_USER")")
+                //권한이 다르잖아요.
+                //.logout();
 
 
 
+
+
+//        http.csrf().disable()//csrf는 form 태그를 통한 공격인데 시큐리티가 이걸 방지하기 위해
+//                .headers().frameOptions().disable()
+//        ;
+//        //form 태그로 값을 전송할 떼, 어떤 value 같이 전송하도록 설정함. 자세한 내용은
+//
+//        //네거티브 방식 = 성문을 다 닫는거에요.  성문을 기본적으로 어떤 요청만 성문을 막아놓을거에요.
+//
+//        http.authorizeRequests()
+//                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
+//                .anyRequest().permitAll() //그 외의 모든 요청은 성문을 열어놓겠다.
+//                .and()
+//                .formLogin()
+//
+//        ; //시큐리티 기본전략이 form..
+
+
+        //저희가 jwt를 사용해서 로그인 처리를 해볼게요.
 
     }
+
+
+
+
+
+    @Bean
+    public JwtLoginFilter jwtLoginFilter() throws Exception {
+
+        final JwtLoginFilter jwtLoginFilter = new JwtLoginFilter(authenticationManager());
+        jwtLoginFilter.setFilterProcessesUrl("/mylogin");
+        jwtLoginFilter.setAuthenticationManager(authenticationManager());
+
+        return jwtLoginFilter;
+    }
+
+
+
+
+
+
+
+
 }
+
+
+
 
 
 //스프링부트 어플리케이션을 만들었잖아요.

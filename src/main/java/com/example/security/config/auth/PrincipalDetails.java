@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @Data //principal (접근 주체) = 세션처럼 사용 = Spring Security Context 에 보관됨
-class PrincipalDetails implements UserDetails {//UserDetails 상속받는 객체를 만든다.
+public class PrincipalDetails implements UserDetails {//UserDetails 상속받는 객체를 만든다.
 
     private User user;
     private Map<String,Object> attributes; //OAuth 제공자로부터 받은 회원 정보

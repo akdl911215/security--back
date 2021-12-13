@@ -19,17 +19,20 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    @Override
+    @Override //Authentication Maneger 가 보내줌
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-       //시큐리티가
-        User principal = userRepository.findByUsername(username);
 
         log.info("username=>{}",username);
-        //신기하지 않아요? 시큐리티가 그냥 url을 제공해줘요. /login /logout
 
+       //AuthenticationFilter가 일로 보내줌
+        User principal = userRepository.findByUsername(username);
+
+        //신기하지 않아요? 시큐리티가 그냥 url을 제공해줘요. /login /logout
         if(principal == null){
             return null;
         }else{
+
+
             return new PrincipalDetails(principal);
         }
     }
