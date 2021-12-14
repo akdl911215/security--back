@@ -35,11 +35,8 @@ public class TestController {
     @PostMapping("/join")
     public String join(@RequestBody JoinDto joinDto){
 
-
         log.info("회원가입 =>{} ", joinDto);
-
         userService.join(joinDto);
-
         return  null;
 
     }
@@ -50,8 +47,9 @@ public class TestController {
     // 등등을 처리해주는 내부적으로 필터와 인터셉터로 이루어지는
     //외부 라이브러리라고 했죠.
 
-    @GetMapping("/find")
+    @GetMapping("/aaaa")
     public User findByUsername(HttpServletRequest request) throws Exception {
+
 
         //log.info("check" + request.getSession());
 
@@ -69,7 +67,11 @@ public class TestController {
         //1. 무식하게 구현하는 방법이 있어요.
         //이렇게 하면 단점이
         //1. 이렇게 권한이 필요한 요청들은 전부 다 일일히 만들어줘야 되요.
-        //2. SRP의 원칙과도 어긋나요. 하나의 클래스는 하나의 책임만
+        //2. SRP의 원칙과도 어긋나요. 하나의 클래스는 하나의 책임만, 유지보수하기 쉽게 하기 위하여
+        //확장성을 늘리기 위해서.
+
+
+
         // 라우팅, 안내원인데 문지기 역할까지 책임이 2개 얘네는 안내원인지 다른 애들이 뭘 하는지 관심도 없고, 그냥 안내만 해주는 역할
         //근데 여기서 문지기 역할까지 하면, 자기 주제를 벗어난 거에요.
 
@@ -81,7 +83,6 @@ public class TestController {
         // 필터는 하나의 성. 필터는 그 성 가장 외벽 문지기 , 인터셉터는 내부 성의 문지기(필터를 통과해서 들어온 요청들을 낚아채서 검사)
         //3. 시큐리티는 외부 1타 문지기를 초정한 거에요.
         //4. 시큐리티필터가 가장 우선순위가 높음. 문지기 중의 대빵
-
 
         return userService.findbyUsername("java");
     }

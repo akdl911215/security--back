@@ -21,7 +21,9 @@ public class User {
     private Long id;
 
     //@Column
+    @Column(unique = true)
     private String username;
+
     private String password;
 
     //enum으로 관리

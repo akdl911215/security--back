@@ -19,7 +19,7 @@ spring:
         web-allow-others: false
       path: /h2-console
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:file:C:/data/sample #?? ?????
     driver-class-name: org.h2.Driver
     username: java
     password: 1234

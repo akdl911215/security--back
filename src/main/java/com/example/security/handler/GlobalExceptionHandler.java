@@ -2,6 +2,7 @@ package com.example.security.handler;
 
 
 import com.example.security.handler.customexception.SessionNotFoundException;
+import com.example.security.handler.customexception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,4 +19,10 @@ public class GlobalExceptionHandler {
         return e.getMessage(); //
     }
 
+
+    @ExceptionHandler(value = UserNotFoundException.class)
+    public String userNotFoundException(UserNotFoundException e){
+
+        return e.getMessage(); //
+    }
 }

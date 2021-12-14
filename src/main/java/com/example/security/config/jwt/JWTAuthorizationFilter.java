@@ -1,8 +1,16 @@
 package com.example.security.config.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.example.security.config.auth.PrincipalDetails;
+import com.example.security.domain.User;
 import com.example.security.domain.UserRepository;
+import com.example.security.handler.customexception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -11,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Optional;
 
 
 @Slf4j
@@ -30,7 +39,49 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         log.info("권헌이 필요한 요청이 들어옴");
 
-        //String header =
+        String header = request.getHeader(JwtProperties.TOKEN_HAEDER);
+
+        log.info("token=>{}", header);
+
+        if(header == null || !header.startsWith(JwtProperties.TOKEN_PRIFIX)){
+
+            log.info("check");
+            chain.doFilter(request,response);
+            return;
+        }
+
+        String token = header.replace(JwtProperties.TOKEN_PRIFIX, "");
+
+        Long userId = JWT.require(Algorithm.HMAC256(JwtProperties.SECRET)).build().verify(token)
+                        .getClaim("id").asLong();
+
+        log.info("userId=>{}",userId);
+
+        if(userId != null){
+
+            log.info("잘 갖고왔다!!");
+
+            User user = userRepository.findById(userId).orElseThrow(()->{
+                return new UserNotFoundException("유저 정보를 찾을 수 없습니다!!");
+            });
+
+            PrincipalDetails principalDetails = new PrincipalDetails(user);
+
+            session.setAttribute("principal", principalDetails);
+
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            principalDetails,
+                            principalDetails.getPassword(),
+                            principalDetails.getAuthorities()
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication); //인증 되었다는 거에요.
+
+
+        }
+
+        chain.doFilter(request, response);
 
     }
 }

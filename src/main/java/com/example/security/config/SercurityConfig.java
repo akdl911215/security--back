@@ -1,6 +1,7 @@
 package com.example.security.config;
 
-import com.example.security.config.jwt.JwtLoginFilter;
+import com.example.security.config.jwt.*;
+import com.example.security.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +15,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.servlet.http.HttpSession;
+
 @RequiredArgsConstructor
 @EnableWebSecurity //시큐리티 활성화
 @Configuration // ioc 등록
 public class SercurityConfig extends WebSecurityConfigurerAdapter {
 
+
+    private final UserRepository userRepository;
+    private final HttpSession session;
 
     @Bean//시큐리티가 비밀번호 검증할 때, 무조건 암호화해서 회원가입을 시켜줘야됨.
     public BCryptPasswordEncoder encoder(){
@@ -40,6 +46,7 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
         config.addAllowedMethod("*"); // 모든 post,get,put,delete, patch ..요청을 허용하겠다.
         config.addAllowedHeader("*"); //모든 header에 응답을 허용하겠다.
         //config.addAllowedOrigin("*");
+        config.addExposedHeader(JwtProperties.TOKEN_HAEDER);
 
         //기본적으로 웹이 같은 도메인이 아니면 요청을 허용시켜주지 않아여.
         //프론트엔드 서버가 도메인 주소를 naver.com  벡엔드서버가 daum.net 같은 ip라도 port가 다르면
@@ -57,6 +64,8 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
                 cors().configurationSource(corsConfigurationSource())
                 .and()
                 .csrf().disable()
+                .headers().frameOptions().disable()
+                .and()
                 .formLogin().disable()
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -65,16 +74,35 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
                 .addFilter(jwtLoginFilter())
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(), userRepository, session))
 
+                .exceptionHandling()
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .accessDeniedHandler(new JwtAceessDeniedHandler())
+                .and()
                 .authorizeRequests()
+                .antMatchers("/user/**").access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+                .antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')")
                 .anyRequest().permitAll()
+                .and()
+                .logout()
+                .logoutUrl("/mylogout")
+                .logoutSuccessHandler(new JwtLogoutSuccessHandler())
+
                 ;
                 //.antMatchers("/user").access("hasRole("ROLE_USER")")
                 //권한이 다르잖아요.
                 //.logout();
 
 
-
+        //jwt를 활용한 인증과 권한 처리를 저희가 직접 한 거에요. 시큐리티를 통해서.
+        // 소셜 로그인, Open auth 인증을 열어
+        // 1. 무식하게 컨트롤러에서 직접 처리한다. 2. 조금 덜 무식하게 내가 직접 시큐리티 같은 필터와 인터셉터를 만든다.
+        //3. 시큐리티를 커스텀해서 사용한다. 4. 구글이나, 페이스북 같은 경우에 auth 인증 서비스, 시큐리티, 유효한
+        //내일 시간이 될 리액트에서 간단한 login app, 시큐리티 연동하는 거 해볼거고, 소셜로그인,
+        //spa 에서 구현하는 거랑 그냥 멀티페이지 같은 다르거든요. 두 개가 소셜로그인 클라이언트 사이트 구현하는 방법이 하나 있고
+        //백엔드 서버에서 구현하는 방법이 있거든요. 프론트에서 구현하는 게 더 간편해요.
+        //그거의 차이점을 알아볼거고..
 
 
 //        http.csrf().disable()//csrf는 form 태그를 통한 공격인데 시큐리티가 이걸 방지하기 위해
@@ -108,6 +136,9 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
         jwtLoginFilter.setFilterProcessesUrl("/mylogin");
         jwtLoginFilter.setAuthenticationManager(authenticationManager());
 
+        jwtLoginFilter.setAuthenticationSuccessHandler(new JwtLoginSuccessHandler());
+        jwtLoginFilter.setAuthenticationFailureHandler(new JwtLoginFailureHandler());
+
         return jwtLoginFilter;
     }
 
@@ -122,13 +153,7 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-
-
 //스프링부트 어플리케이션을 만들었잖아요.
-
 //하나의 성. 성문 문지기가 있을
-
 //시큐리티 필터가 정문 가장 앞의 문지기, 필터를
-
 //클라이언트 rest 요청 -> 성   문지기 검사하고 성문 3개가 있다고 생각. 제일 바깥에 있는 문이 시큐리티. 그 다음에 내부적인 필터를
-

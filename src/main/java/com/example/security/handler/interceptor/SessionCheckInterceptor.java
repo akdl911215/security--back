@@ -21,6 +21,12 @@ public class SessionCheckInterceptor implements HandlerInterceptor {
 
                 PrincipalDetails principal = (PrincipalDetails) session.getAttribute("principal");
 
+                //jwt
+
+                //세션 <-> JWt의 장점 이란 게
+                //1. 언어에 독립적임. json은 모든 언어들간의 표준통신언어,
+                //2. 확장성이 유리해요.
+
                 if (principal == null){
                     //세션이 없으면 통과를 못 시켜주도록
                     log.info("인터셉터 발동!");
@@ -33,5 +39,7 @@ public class SessionCheckInterceptor implements HandlerInterceptor {
 
     //PostHandle() – 컨트롤러 실행 후 ViewResolver Or MessageConverter가 관여하기 전 실행됨.
     //afterComplete() – view가 정상적으로 렌더링 된 후 제일 마지막 실행됨.
+
+
 
 }

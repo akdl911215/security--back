@@ -32,6 +32,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
 
     //시큐리티는 기본적으로 form 방식, 기존 로그인 방식을 갈아치울거에요.
+    //post 방식으로 /mylogin 으로 오는 요청을 낚아채요.
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
@@ -53,6 +54,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
+        //authenticationManager에게 token을 전달하면, 자동으로 UserDetailsService 가 호출되요. => 응답을 해줘요.
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         return authentication;
