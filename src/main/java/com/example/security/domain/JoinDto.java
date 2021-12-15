@@ -20,7 +20,7 @@ public class JoinDto {
         return User.builder()
                 .username(username)
                 .password(password)
-                .role("USER")
+                .role(Role.USER)
                 .build();
 
     }

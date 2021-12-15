@@ -67,7 +67,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
             PrincipalDetails principalDetails = new PrincipalDetails(user);
 
-            session.setAttribute("principal", principalDetails);
+            session.setAttribute("principal", principalDetails); //필요할 수도 있고 안 필요할 수도 있는데
 
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(

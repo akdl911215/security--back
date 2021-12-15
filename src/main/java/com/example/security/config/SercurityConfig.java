@@ -88,6 +88,9 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/mylogout")
                 .logoutSuccessHandler(new JwtLogoutSuccessHandler())
+                .and()
+                .oauth2Login()
+                .userInfoEndpoint()
 
                 ;
                 //.antMatchers("/user").access("hasRole("ROLE_USER")")
@@ -96,11 +99,11 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
 
 
         //jwt를 활용한 인증과 권한 처리를 저희가 직접 한 거에요. 시큐리티를 통해서.
-        // 소셜 로그인, Open auth 인증을 열어
+        // 내일 소셜 로그인, Open auth 인증을 열어, refreshToken과 accessToken 개념 설명.
         // 1. 무식하게 컨트롤러에서 직접 처리한다. 2. 조금 덜 무식하게 내가 직접 시큐리티 같은 필터와 인터셉터를 만든다.
         //3. 시큐리티를 커스텀해서 사용한다. 4. 구글이나, 페이스북 같은 경우에 auth 인증 서비스, 시큐리티, 유효한
         //내일 시간이 될 리액트에서 간단한 login app, 시큐리티 연동하는 거 해볼거고, 소셜로그인,
-        //spa 에서 구현하는 거랑 그냥 멀티페이지 같은 다르거든요. 두 개가 소셜로그인 클라이언트 사이트 구현하는 방법이 하나 있고
+        //spa 에서 구현하는 거랑 그냥 멀티페이지에서 구현하는게 다르거든요. 두 개가 소셜로그인 클라이언트 사이트 구현하는 방법이 하나 있고
         //백엔드 서버에서 구현하는 방법이 있거든요. 프론트에서 구현하는 게 더 간편해요.
         //그거의 차이점을 알아볼거고..
 

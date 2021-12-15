@@ -8,27 +8,36 @@ server:
       enabled: true
 spring:
   security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 65042798307-j7fa7o7d22m1nthjh32jh5blfg4551p5.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+            - email
+            - profile
+
     user:
       name: java
       password: 1234
 
-  h2:
-    console:
-      enabled: true
-      settings:
-        web-allow-others: false
-      path: /h2-console
+#  h2:
+#    console:
+#      enabled: true
+#      settings:
+#        web-allow-others: false
+#      path: /h2-console
   datasource:
-    url: jdbc:h2:file:C:/data/sample #?? ?????
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://localhost:3306/securityexample?serverTimezone=Asia/Seoul
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: java
     password: 1234
 
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true

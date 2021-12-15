@@ -67,10 +67,12 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
        PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
+       //JWT는 Header와 payload, Sifnature 이렇게 세 부분으로 이루어짐
+
        String jwtToken = JWT.create()
                .withSubject(principalDetails.getUsername())
-               .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRE_TIME)) //토큰의 유효기간
-               .withClaim("id", principalDetails.getUser().getId())
+               .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRE_TIME)) //토큰의 유효기간 현재시간으로부터 1시간
+               .withClaim("id", principalDetails.getUser().getId()) //인증에 필요한 정보
                .withClaim("username", principalDetails.getUser().getPassword())
                .sign(Algorithm.HMAC256(JwtProperties.SECRET));
 

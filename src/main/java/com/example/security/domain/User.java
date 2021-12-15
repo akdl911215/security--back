@@ -27,7 +27,8 @@ public class User {
     private String password;
 
     //enum으로 관리
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 
 }
