@@ -3,8 +3,11 @@ package com.example.security.config.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.security.config.auth.PrincipalDetails;
+import com.example.security.config.oauth.GoogleInfo;
+import com.example.security.config.oauth.OAuth2UserInfo;
 import com.example.security.domain.CMRespDto;
 import com.example.security.domain.LoginDto;
+import com.example.security.domain.User;
 import com.example.security.utills.Script;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Date;
+import java.util.Map;
 
 //UsernamePasswordAuthenticationFilter 를 커스텀해서 갈아치웁니다.
 @Slf4j
@@ -48,6 +52,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         } catch (IOException e) {
             e.printStackTrace();
             log.info("로그인 요청 dto 생성 중 실패: " + e.getMessage());
+
         }
 
         //1. UsernamePassword 토큰을 만들기

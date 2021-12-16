@@ -1,7 +1,10 @@
 package com.example.security.web;
 
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.security.config.auth.PrincipalDetails;
+import com.example.security.config.jwt.JwtProperties;
 import com.example.security.config.oauth.GoogleInfo;
 import com.example.security.config.oauth.OAuth2UserInfo;
 import com.example.security.domain.*;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,10 +31,7 @@ import java.util.UUID;
 public class TestController {
 
     private final UserService userService;
-
     private final UserRepository userRepository;
-
-
     private final BCryptPasswordEncoder encoder;
 
     @GetMapping("/check")
@@ -122,6 +123,17 @@ public class TestController {
             userEntity = userRepository.save(user);
 
         }
+
+
+
+        String jwtToken = JWT.create()
+                .withSubject(userEntity.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRE_TIME)) //토큰의 유효기간 현재시간으로부터 1시간
+                .withClaim("id", userEntity.getId()) //인증에 필요한 정보
+                .withClaim("username", userEntity.getPassword())
+                .sign(Algorithm.HMAC256(JwtProperties.SECRET));
+
+        response.addHeader(JwtProperties.TOKEN_HAEDER, JwtProperties.TOKEN_PRIFIX + jwtToken);
 
         //소셜 로그인
         //아무튼 간에 여기서 토큰을 만들고
