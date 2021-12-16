@@ -2,19 +2,24 @@ package com.example.security.web;
 
 
 import com.example.security.config.auth.PrincipalDetails;
-import com.example.security.domain.JoinDto;
-import com.example.security.domain.User;
+import com.example.security.config.oauth.GoogleInfo;
+import com.example.security.config.oauth.OAuth2UserInfo;
+import com.example.security.domain.*;
 import com.example.security.handler.customexception.SessionNotFoundException;
 import com.example.security.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +27,11 @@ import javax.servlet.http.HttpSession;
 public class TestController {
 
     private final UserService userService;
+
+    private final UserRepository userRepository;
+
+
+    private final BCryptPasswordEncoder encoder;
 
     @GetMapping("/check")
     public String check(){
@@ -86,6 +96,41 @@ public class TestController {
 
         return userService.findbyUsername("java");
     }
+
+
+
+    @PostMapping("/socialLogin")
+    public CMRespDto socialLogin(@RequestBody Map<String, Object> data, HttpServletResponse response){
+
+        log.info("소셜 로그인 진행 " + data);
+
+
+        OAuth2UserInfo googleUser =
+                new GoogleInfo((Map<String, Object>) data.get("profileObj"));
+
+        log.info("googleUser: " + googleUser);
+        User userEntity = userRepository.findByUsername("Google_" + googleUser.getUsername());
+        UUID uuid = UUID.randomUUID();
+        String encPassword = encoder.encode(uuid.toString());
+        if(userEntity == null){
+            log.info("얘네는 소셜로그인으로 최초 로그인한 사용자, 자동으로 우리 db로 회원가입을 진행시키자");
+
+            User user = User.builder()
+                    .username(googleUser.getUsername())
+                    .password(encPassword)
+                    .role(Role.USER)
+                    .build();
+
+            userEntity = userRepository.save(user);
+
+        }
+
+        //아무튼 간에 여기서 토큰을 만들고
+
+        //return new CMRespDto(1, )
+        return  null;
+    }
+
 
     
 }

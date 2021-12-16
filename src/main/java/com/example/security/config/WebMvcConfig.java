@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,5 +43,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new SessionCheckInterceptor()).addPathPatterns("/check");
 
     }
+
+
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        //WebMvcConfigurer.super.addResourceHandlers(registry);
+//
+//        String resourcelocation = "file:C:\\Users\\songn\\Documents\\Lightshot\\";
+//        String resourcelurl = "/upload/**";
+//
+//        registry.addResourceHandler(resourcelurl)
+//                .addResourceLocations(resourcelocation);
+//    }
 }
 
