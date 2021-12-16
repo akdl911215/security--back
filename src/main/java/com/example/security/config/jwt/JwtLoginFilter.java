@@ -8,6 +8,7 @@ import com.example.security.config.oauth.OAuth2UserInfo;
 import com.example.security.domain.CMRespDto;
 import com.example.security.domain.LoginDto;
 import com.example.security.domain.User;
+import com.example.security.utills.CookieUtill;
 import com.example.security.utills.Script;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,6 +36,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
 
+    private final CookieUtill cookieUtill;
 
     //시큐리티는 기본적으로 form 방식, 기존 로그인 방식을 갈아치울거에요.
     //post 방식으로 /mylogin 으로 오는 요청을 낚아채요.
@@ -81,7 +84,10 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
                .withClaim("username", principalDetails.getUser().getPassword())
                .sign(Algorithm.HMAC256(JwtProperties.SECRET));
 
-       response.addHeader(JwtProperties.TOKEN_HAEDER, JwtProperties.TOKEN_PRIFIX + jwtToken);
+       //response.addHeader(JwtProperties.TOKEN_HAEDER, JwtProperties.TOKEN_PRIFIX + jwtToken);
+
+       Cookie accessCookie = cookieUtill.createCookie(JwtProperties.ACCESS_TOKEN_NAME, jwtToken);
+       response.addCookie(accessCookie);
 
         CMRespDto cmRespDto = new CMRespDto(1, principalDetails.getUser());
 

@@ -18,4 +18,5 @@ public class SecurityApplication {
 //왜 spa 에서 하이퍼링크를 쓰면 안 되는지, 자동로그인, 쿠키로 던져줄때, 보안상 차이점, 가능하면 redis,
 //어땠는지 모르겠는 리덕스 스토어로 설명.. 권한 요청 같은 거..
 //웹 보안 정책 설명.. revers proxy 로 cors 우회해보자. 쿠키의 httponly 옵션과,
-//월차와 렌탈 수정 후 업데이트
+//월차와 렌탈 수정 후 업데이트, 세션이 가장 보안에 유리, ExceptionHandler에서 error 리턴.
+//@principal 어노테이션

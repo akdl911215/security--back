@@ -2,6 +2,7 @@ package com.example.security.config;
 
 import com.example.security.config.jwt.*;
 import com.example.security.domain.UserRepository;
+import com.example.security.utills.CookieUtill;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,8 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserRepository userRepository;
     private final HttpSession session;
+    private final CookieUtill cookieUtill;
+
 
     @Bean//시큐리티가 비밀번호 검증할 때, 무조건 암호화해서 회원가입을 시켜줘야됨.
     public BCryptPasswordEncoder encoder(){
@@ -74,7 +77,7 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
                 .addFilter(jwtLoginFilter())
-                .addFilter(new JWTAuthorizationFilter(authenticationManager(), userRepository, session))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(), userRepository, session, cookieUtill))
 
                 .exceptionHandling()
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
@@ -87,7 +90,7 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/mylogout")
-                .logoutSuccessHandler(new JwtLogoutSuccessHandler())
+                .logoutSuccessHandler(new JwtLogoutSuccessHandler(cookieUtill))
                 .and()
                 .oauth2Login()
                 .userInfoEndpoint()
@@ -135,7 +138,7 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JwtLoginFilter jwtLoginFilter() throws Exception {
 
-        final JwtLoginFilter jwtLoginFilter = new JwtLoginFilter(authenticationManager());
+        final JwtLoginFilter jwtLoginFilter = new JwtLoginFilter(authenticationManager(), cookieUtill);
         jwtLoginFilter.setFilterProcessesUrl("/mylogin");
         jwtLoginFilter.setAuthenticationManager(authenticationManager());
 
