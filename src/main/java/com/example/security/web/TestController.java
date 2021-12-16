@@ -103,20 +103,18 @@ public class TestController {
     public CMRespDto socialLogin(@RequestBody Map<String, Object> data, HttpServletResponse response){
 
         log.info("소셜 로그인 진행 " + data);
-
-
         OAuth2UserInfo googleUser =
                 new GoogleInfo((Map<String, Object>) data.get("profileObj"));
 
         log.info("googleUser: " + googleUser);
-        User userEntity = userRepository.findByUsername("Google_" + googleUser.getUsername());
+        User userEntity = userRepository.findByUsername(googleUser.getId());
         UUID uuid = UUID.randomUUID();
         String encPassword = encoder.encode(uuid.toString());
         if(userEntity == null){
             log.info("얘네는 소셜로그인으로 최초 로그인한 사용자, 자동으로 우리 db로 회원가입을 진행시키자");
 
             User user = User.builder()
-                    .username(googleUser.getUsername())
+                    .username(googleUser.getId())
                     .password(encPassword)
                     .role(Role.USER)
                     .build();
@@ -125,10 +123,10 @@ public class TestController {
 
         }
 
+        //소셜 로그인
         //아무튼 간에 여기서 토큰을 만들고
-
         //return new CMRespDto(1, )
-        return  null;
+        return  new CMRespDto(1, userEntity);
     }
 
 

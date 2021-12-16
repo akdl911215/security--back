@@ -31,11 +31,11 @@ public class SercurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-//    @Override
-//    public void configure(WebSecurity web) throws Exception {
-//        super.configure(web);
-//        web.ignoring().mvcMatchers("/**"); //문지기가 사람들을 다 통과시켜줌
-//    }
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        super.configure(web);
+        web.ignoring().mvcMatchers("/socialLogin"); //문지기가 사람들을 다 통과시켜줌
+    }
 
 
     @Bean

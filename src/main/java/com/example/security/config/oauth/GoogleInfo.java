@@ -15,6 +15,6 @@ public class GoogleInfo extends OAuth2UserInfo{
 
     @Override
     public String getId() {
-        return (String) attributes.get("sub");
+        return "Google_" + (String) attributes.get("googleId");
     }
 }
