@@ -89,7 +89,9 @@ public class AuthController {
                 .withClaim("username", userEntity.getPassword())
                 .sign(Algorithm.HMAC256(JwtProperties.SECRET));
 
-        response.addHeader(JwtProperties.TOKEN_HAEDER, JwtProperties.TOKEN_PRIFIX + jwtToken);
+        //response.addHeader(JwtProperties.TOKEN_HAEDER, JwtProperties.TOKEN_PRIFIX + jwtToken);
+
+
 
         //소셜 로그인
         //아무튼 간에 여기서 토큰을 만들고

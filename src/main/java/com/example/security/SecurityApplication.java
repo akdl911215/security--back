@@ -20,3 +20,7 @@ public class SecurityApplication {
 //웹 보안 정책 설명.. revers proxy 로 cors 우회해보자. 쿠키의 httponly 옵션과,
 //월차와 렌탈 수정 후 업데이트, 세션이 가장 보안에 유리, ExceptionHandler에서 error 리턴.
 //@principal 어노테이션
+
+
+
+

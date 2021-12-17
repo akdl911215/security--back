@@ -20,7 +20,7 @@ public class CookieUtill {
 
     public Cookie createCookie(String cookieName, String value){
         Cookie cookie = new Cookie(cookieName,value);
-        cookie.setHttpOnly(true); //자바스크립트 공격으로부터 안전
+        cookie.setHttpOnly(true); //자바스크립트 공격으로부터 안전, xss 공격으로부터 안전
         cookie.setMaxAge(JwtProperties.ACCESS_TOKEN_VALIDATION_TIME);
         cookie.setPath("/");
         cookie.setSecure(true);
