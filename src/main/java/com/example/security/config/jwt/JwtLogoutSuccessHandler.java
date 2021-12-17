@@ -1,6 +1,7 @@
 package com.example.security.config.jwt;
 
 import com.example.security.domain.CMRespDto;
+import com.example.security.utills.CookieUtill;
 import com.example.security.utills.Script;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,13 @@ import java.io.IOException;
 
 @Slf4j
 public class JwtLogoutSuccessHandler implements LogoutSuccessHandler{
+
+
+    private final CookieUtill cookieUtill;
+
+    public JwtLogoutSuccessHandler(CookieUtill cookieUtill) {
+        this.cookieUtill = cookieUtill;
+    }
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {

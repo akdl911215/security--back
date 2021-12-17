@@ -8,6 +8,7 @@ import com.example.security.config.oauth.OAuth2UserInfo;
 import com.example.security.domain.CMRespDto;
 import com.example.security.domain.LoginDto;
 import com.example.security.domain.User;
+import com.example.security.utills.CookieUtill;
 import com.example.security.utills.Script;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.util.Map;
 public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final CookieUtill cookieUtill;
 
 
     //시큐리티는 기본적으로 form 방식, 기존 로그인 방식을 갈아치울거에요.
@@ -74,6 +77,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 
        //JWT는 Header와 payload, Sifnature 이렇게 세 부분으로 이루어짐
 
+
        String jwtToken = JWT.create()
                .withSubject(principalDetails.getUsername())
                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRE_TIME)) //토큰의 유효기간 현재시간으로부터 1시간
@@ -81,11 +85,20 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
                .withClaim("username", principalDetails.getUser().getPassword())
                .sign(Algorithm.HMAC256(JwtProperties.SECRET));
 
-       response.addHeader(JwtProperties.TOKEN_HAEDER, JwtProperties.TOKEN_PRIFIX + jwtToken);
+        String jwtRefreshToken = JWT.create()
+                .withSubject(principalDetails.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.REFRESH_TOKEN_VALIDATION_TIME))
+                .withClaim("id", principalDetails.getUser().getId()) //인증에 필요한 정보
+                .withClaim("username", principalDetails.getUser().getPassword())
+                .sign(Algorithm.HMAC256(JwtProperties.SECRET));
+
+        Cookie refreshCookie = cookieUtill.createCookie(JwtProperties.REFRESH_TOKEN_NAME, jwtRefreshToken);
+        response.addCookie(refreshCookie);
+
+        response.addHeader(JwtProperties.TOKEN_HAEDER, JwtProperties.TOKEN_PRIFIX + jwtToken);
+
 
         CMRespDto cmRespDto = new CMRespDto(1, principalDetails.getUser());
-
         Script.responseData(response, cmRespDto);
-
     }
 }
