@@ -37,7 +37,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        log.info("권헌이 필요한 요청이 들어옴");
+        log.info("시큐리티 사용하면, 권헌이 필요한 요청이 들어옴" );
 
         String header = request.getHeader(JwtProperties.TOKEN_HAEDER);
 

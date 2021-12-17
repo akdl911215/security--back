@@ -12,6 +12,8 @@ import com.example.security.handler.customexception.SessionNotFoundException;
 import com.example.security.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -141,6 +144,21 @@ public class TestController {
         return  new CMRespDto(1, userEntity);
     }
 
+
+
+    @GetMapping("/loadUser")
+    public CMRespDto<?> loadUser(@AuthenticationPrincipal PrincipalDetails principal, HttpServletResponse resp) throws IOException {
+        User user = principal.getUser();
+
+        if (user == null) { //세션이 만료된 거에요.
+            log.info("user가 null이면");
+            resp.sendRedirect("/logout");
+        }
+        log.info("유저정보 유지" + user);
+        //resp.addHeader("");
+
+        return new CMRespDto<>(2, user);
+    }
 
     
 }

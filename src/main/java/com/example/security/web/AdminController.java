@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AdminController {
 
-
     @GetMapping("/get")
     public String admin(){
-
+        //관리자 권한이 필요한 요청
+        
         return "Admin 정보";
     }
 
