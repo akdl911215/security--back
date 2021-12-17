@@ -19,7 +19,10 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler{
 
       log.info("로그아웃 성공!");
 
-        CMRespDto cmRespDto = new CMRespDto(1, null);
+
+      //원래는 막 여기서 저희가 발생한 jwt 강제로 만료시키는 게 좋은 데 딱히 방법이 없어요.보안 취약점
+
+        CMRespDto cmRespDto = new CMRespDto(1, "로그아웃");
 
 
         Script.responseData(response, cmRespDto);
